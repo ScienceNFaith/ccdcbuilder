@@ -1,45 +1,12 @@
-﻿<#
-.TITLE
-  CCDC Builder
-.SYNOPSIS
-  Create randomized, virtual networks on the fly for safe red vs. blue environments. 
-.DESCRIPTION
-  This is a program to automate the creation of virtual networks on the Cyber Security Club at UVU's ESXi server. This is with the intention to give the CCDC team a safe environment to practice blue teaming, while also giving club members a chance to try red teaming during special events. 
-.PARAMETER <address>
-  The ip address or fqdn of the vCenter server to connect to.
-.PARAMETER <difficulty>
-  The difficulty setting desired, from 1-5. Higher numbers create more difficult scenarios.
-.PARAMETER <teams>
-  The number of identical networks to create.
-.INPUTS
-  Username: The username to log into the server.
-  Password: The password for the user to log into the server.
-.OUTPUTS
-  Prints to screen the status of current steps towards completing the task. 
-.NOTES
-  Version:        1.0
-  Author:         Christopher Hallstrom
-  Creation Date:  November 17, 2018
-  Purpose/Change: Initial script development
-  
-.EXAMPLE
-  ./CCDCBuilder.ps1 -address 192.168.0.10 -difficulty 2 -teams 1
-#>
- 
-
-#------------------------------------	 Globals 	------------------------------------#
-param (
+﻿param (
 	[Parameter(Mandatory=$true)][string]$address,
 	[string]$difficulty = 1,
 	[string]$teams = 1,
 	[string]$filename,
 	[switch]$help
 )
-#username in 'connect to server' section
-#password in 'connect to server' section
-#credentials created from username and password in 'connect to server' section
 
-#------------------------------------	Functions	------------------------------------#
+
 function printHelp { 
   if($server) {Disconnect-VIServer -Server $server -confirm:$false -force}
 	write-host "CCDC Builder, an automated practice environment generator"
@@ -61,13 +28,12 @@ function printHelp {
   exit 1
 }
 
-
-#------------------------------------	Execution 	------------------------------------#
 trap {"$_"; exit 1;}
 $ErrorActionPreference = "Stop"
 
 
-####  Print usage if help   ####
+
+####  	Print usage   ####
 if($help) {printHelp}
 
 ####	Verify Powershell version	####
@@ -112,7 +78,7 @@ $server = Connect-VIServer -Server $address -credential $credentials -force
 write-host "Connected successfully"
 
 
-####  Configure network   ####
+####  	Configure network   ####
 <#switch ($difficulty) {
 	1 {
     write-host "Configuring for difficulty 1"
@@ -144,7 +110,7 @@ For ($i=1; $i -le $teams; $i++) {
 }#>
 
 
-#### 	POC 	####
+####  POC 	####
 write-host "Configuring for POC"
 $workstation_templates = Get-Template -Name Ubuntu* -Server $server -Datastore "Small Storage" #-Location "Templates/"
 $workstation_template = $workstation_templates[0]	# $workstation_templates[(Get-Random -Maximum ([array]$workstation_templates).count)]
